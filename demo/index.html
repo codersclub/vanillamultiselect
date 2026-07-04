@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VanillaMultiSelect Demo</title>
+
+  <link rel="stylesheet" href="../src/multiselect.css">
+</head>
+<body>
+
+  <h1>VanillaMultiSelect Demo</h1>
+
+  <select class="multi-select" multiple name="colors[]">
+    <option value="1">Red</option>
+    <option value="2">Green</option>
+    <option value="3">Blue</option>
+  </select>
+
+  <script src="../src/multiselect.js"></script>
+
+  <script>
+    document.querySelectorAll('.multi-select').forEach(el => {
+      new MultiSelect(el, {
+        searchable: true
+      });
+    });
+  </script>
+
+</body>
+</html>
