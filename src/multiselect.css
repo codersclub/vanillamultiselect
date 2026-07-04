@@ -1,0 +1,78 @@
+.vms {
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+
+.vms-selection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    border-radius: 6px;
+    min-height: 36px;
+}
+
+.vms-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+.vms-tag {
+    background: #0d6efd;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.vms-remove {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vms-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #999;
+    background: white;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.vms-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    background: white;
+    display: none;
+    max-height: 240px;
+    overflow: auto;
+    z-index: 999;
+    border-radius: 6px;
+}
+
+.vms-dropdown.open {
+    display: block;
+}
+
+.vms-option {
+    display: flex;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.vms-option:hover {
+    background: #f3f3f3;
+}
