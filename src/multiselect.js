@@ -1,13 +1,16 @@
 class MultiSelect {
     constructor(el, options = {}) {
         this.select = el;
+
         this.options = Object.assign({
-            searchable: false
+            searchable: false,
+            searchPlaceholder: "Search..."
         }, options);
 
         this.state = {
             isOpen: false,
-            values: new Set()
+            values: new Set(),
+            search: ""
         };
 
         this.#init();
@@ -24,7 +27,7 @@ class MultiSelect {
         this.#renderTags();
     }
 
-    /* ================= DOM BUILD ================= */
+    /* ================= BUILD ================= */
 
     #hideNativeSelect() {
         this.select.style.display = 'none';
@@ -48,8 +51,23 @@ class MultiSelect {
         this.dropdown = document.createElement('div');
         this.dropdown.className = 'vms-dropdown';
 
+        /* ===== SEARCH ===== */
+        this.searchWrap = document.createElement('div');
+        this.searchWrap.className = 'vms-search-wrap';
+
+        this.searchInput = document.createElement('input');
+        this.searchInput.type = 'text';
+        this.searchInput.className = 'vms-search';
+        this.searchInput.placeholder = this.options.searchPlaceholder;
+
+        this.searchWrap.appendChild(this.searchInput);
+
         this.optionsList = document.createElement('div');
         this.optionsList.className = 'vms-options';
+
+        if (this.options.searchable) {
+            this.dropdown.appendChild(this.searchWrap);
+        }
 
         this.dropdown.appendChild(this.optionsList);
 
@@ -75,9 +93,16 @@ class MultiSelect {
                 this.close();
             }
         });
+
+        if (this.options.searchable) {
+            this.searchInput.addEventListener('input', () => {
+                this.state.search = this.searchInput.value.toLowerCase();
+                this.#renderOptions();
+            });
+        }
     }
 
-    /* ================= STATE INIT ================= */
+    /* ================= STATE ================= */
 
     #syncFromSelect() {
         Array.from(this.select.options).forEach(opt => {
@@ -94,6 +119,13 @@ class MultiSelect {
 
         Array.from(this.select.options).forEach(opt => {
             if (!opt.value) return;
+
+            /* FILTER */
+            if (this.state.search) {
+                if (!opt.text.toLowerCase().includes(this.state.search)) {
+                    return;
+                }
+            }
 
             const label = document.createElement('label');
             label.className = 'vms-option';
@@ -137,9 +169,7 @@ class MultiSelect {
 
             remove.addEventListener('click', () => {
                 this.state.values.delete(value);
-                this.#syncToSelect();
-                this.#renderTags();
-                this.#renderOptions();
+                this.#commit();
             });
 
             tag.appendChild(text);
@@ -149,7 +179,7 @@ class MultiSelect {
         });
     }
 
-    /* ================= CORE LOGIC ================= */
+    /* ================= CORE ================= */
 
     #toggleValue(value, checked) {
         if (checked) {
@@ -158,8 +188,14 @@ class MultiSelect {
             this.state.values.delete(value);
         }
 
+        this.#commit();
+    }
+
+    #commit() {
         this.#syncToSelect();
         this.#renderTags();
+        this.#renderOptions();
+        this.#dispatchChange();
     }
 
     #syncToSelect() {
@@ -168,7 +204,19 @@ class MultiSelect {
         });
     }
 
-    /* ================= OPEN/CLOSE ================= */
+    /* ================= EVENTS ================= */
+
+    #dispatchChange() {
+        const event = new CustomEvent("vms:change", {
+            detail: {
+                values: Array.from(this.state.values)
+            }
+        });
+
+        this.select.dispatchEvent(event);
+    }
+
+    /* ================= OPEN / CLOSE ================= */
 
     toggle() {
         this.state.isOpen ? this.close() : this.open();
@@ -185,7 +233,7 @@ class MultiSelect {
     }
 }
 
-/* ============== GLOBAL INIT ============== */
+/* ================= AUTO INIT ================= */
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.multi-select').forEach(el => {
