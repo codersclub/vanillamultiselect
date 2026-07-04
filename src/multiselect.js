@@ -25,6 +25,7 @@ class MultiSelect {
         this.#syncFromSelect();
         this.#renderOptions();
         this.#renderTags();
+        this.#toggleClearButton();
     }
 
     /* ================= BUILD ================= */
@@ -60,7 +61,14 @@ class MultiSelect {
         this.searchInput.className = 'vms-search';
         this.searchInput.placeholder = this.options.searchPlaceholder;
 
+        /* NEW: clear button */
+        this.searchClear = document.createElement('button');
+        this.searchClear.type = 'button';
+        this.searchClear.className = 'vms-search-clear';
+        this.searchClear.textContent = '×';
+
         this.searchWrap.appendChild(this.searchInput);
+        this.searchWrap.appendChild(this.searchClear);
 
         this.optionsList = document.createElement('div');
         this.optionsList.className = 'vms-options';
@@ -78,6 +86,16 @@ class MultiSelect {
         this.container.appendChild(this.dropdown);
 
         this.select.parentNode.insertBefore(this.container, this.select);
+    }
+
+    #toggleClearButton() {
+        if (!this.options.searchable) return;
+
+        if (this.searchInput.value.length > 0) {
+            this.searchClear.style.display = 'block';
+        } else {
+            this.searchClear.style.display = 'none';
+        }
     }
 
     /* ================= EVENTS ================= */
@@ -98,6 +116,23 @@ class MultiSelect {
             this.searchInput.addEventListener('input', () => {
                 this.state.search = this.searchInput.value.toLowerCase();
                 this.#renderOptions();
+            });
+        }
+
+        if (this.options.searchable) {
+
+            this.searchInput.addEventListener('input', () => {
+                this.state.search = this.searchInput.value.toLowerCase();
+                this.#renderOptions();
+                this.#toggleClearButton();
+            });
+
+            this.searchClear.addEventListener('click', () => {
+                this.searchInput.value = '';
+                this.state.search = '';
+                this.#renderOptions();
+                this.#toggleClearButton();
+                this.searchInput.focus();
             });
         }
     }
